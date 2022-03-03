@@ -1,0 +1,293 @@
+#!/bin/bash
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+path() {
+  echo $1
+}
+
+docker_path() {
+  if [ "$OSYSTEM" == "WINDOWS" ]; then
+    echo $(echo $dir_mount$1 | sed 's|//\(\w\)/|\1:/|')
+  else
+    echo $1
+  fi
+}
+
+get_os() {
+    case "$OSTYPE" in
+      solaris*) echo "SOLARIS";;
+      darwin*)  echo "OSX";;
+      linux*)   echo "LINUX";;
+      bsd*)     echo "BSD";;
+      msys*)    echo "WINDOWS";;
+      cygwin*)  echo "WINDOWS";;
+      *)        echo "";;
+    esac
+}
+
+. $(path $dir/scripts/io.sh)
+. $(path $dir/scripts/propagate.sh)
+. $(path $dir/scripts/list.sh)
+. $(path $dir/scripts/state.sh)
+. $(path $dir/scripts/build.sh)
+. $(path $dir/scripts/install.sh)
+. $(path $dir/scripts/pre_spinup.sh)
+. $(path $dir/scripts/post_spinup.sh)
+. $(path $dir/scripts/defs.sh)
+
+user=$(id -u $USER)
+group=$(id -g $USER)
+
+OSYSTEM=$(get_os);
+if [ "$OSYSTEM" == '' ]; then
+  io_error_header
+  io_write " Unsupported operating system "
+  io_write_bold $OSTYPE;
+  io_flush
+  exit 1
+elif [ "$OSYSTEM" == "WINDOWS" ]; then
+  dir_temp="/$dir_temp"
+  dir_sbin="/$dir_sbin"
+  dir_mount="/"
+  dir_home=/c/Users/carlo
+  dir_ssh=$(path ${dir_home}/.ssh)
+fi
+
+case $1 in
+  help)
+    io_help_header
+    io_help_title "Listing all commands available"
+    io_help_entry_level 1 "help" " - This menu"
+    io_help_entry_level 1 "list" " - List all applications"
+    io_help_entry_level 1 "docker" " - Manage the docker environment"
+    io_help_entry_level 1 "<application>" " - Action to be executed on the selected application"
+    ;;
+  list)
+    # check for help option
+    if [ "$2" == "help" ]; then
+      io_help_header
+      io_help_title "Listing all options available to the list command"
+      io_help_entry_level 2 "list" "help" "- This menu"
+      io_help_entry_level 1 "list" "- List all applications"
+    else
+      # check for unexpected action
+      if [ "$#" -ge 2 ]; then
+        io_option_unknown $2 $1
+      fi
+
+      # list all applications
+      list
+    fi
+    ;;
+  docker)
+    # set command as docker
+    command=$1
+ 
+    # check for mandatory action argument
+    if [ -z $2 ]; then
+        io_option_missing $command
+    fi
+    action=$2
+
+    case $action in
+      help)
+        io_help_header
+        io_help_title "Listing all actions available to the xdebug command"
+        io_help_entry_level 2 $command "help" " - This menu"
+        io_help_entry_level 2 $command "up" " - Spin up the docker environment"
+        io_help_entry_level 2 $command "start" " - Start/restart the application(s) containers"
+        io_help_entry_level 2 $command "stop" " - Stop the application(s) containers"
+        io_help_entry_level 2 $command "down" " - Teardown the currently running docker environment"
+        ;;
+      up)
+        # check for help option
+        if [ "$3" == "help" ]; then
+          io_help_header
+          io_help_title "Listing all options available to the up action of the xdebug command"
+          io_help_entry_level 3 $command $action "help" " - This menu"
+          io_help_entry_level 2 $command $action " - Spin up the docker environment"
+        else
+          # check for unexpected option
+          if [ "$#" -ge 3 ]; then
+            io_option_unknown $3 $1 $2
+          fi
+
+          io_info "Spin up docker environment ...\n"
+          io_flush
+
+          # create the docker-compose partials storing temp folder
+          mkdir -p $dir_partial
+
+          # execute the pre docker spin-up scripts on all the applications
+          propagate pre.spinup
+
+          # create the final docker-compose file
+          echo "version: '3'" > $(path $dir/docker-compose.yaml)
+          echo "" >> $(path $dir/docker-compose.yaml)
+          echo "volumes:" >> $(path $dir/docker-compose.yaml)
+          echo "  datavol:" >> $(path $dir/docker-compose.yaml)
+          echo "    driver: local" >> $(path $dir/docker-compose.yaml)
+          echo "" >> $(path $dir/docker-compose.yaml)
+          echo "services:" >> $(path $dir/docker-compose.yaml)
+
+          for partial in `ls $(path $dir_partial)`; do
+            echo "$(cat $(path $dir_partial/$partial))" >> $(path $dir/docker-compose.yaml)
+          done
+
+          # raising containers
+          io_info "Raising application(s) containers ...\n"
+          io_flush
+
+          docker-compose up -d --remove-orphans
+          if [ $? -ne 0 ]; then
+            io_error "Error spinning up docker containers\n"
+          fi
+          rm -rf $dir_partial
+
+          io_info "Containers raised\n"
+          io_flush
+
+          # execute the post docker spin-up scripts on all the applications
+          propagate post.spinup
+
+          propagate restart
+        fi
+        ;;
+      start)
+        # check for help option
+        if [ "$3" == "help" ]; then
+          io_help_header
+          io_help_title "Listing all options available to the start action of the xdebug command"
+          io_help_entry_level 3 $command $action "help" " - This menu"
+          io_help_entry_level 2 $command $action " - Start/restart the application(s) containers"
+        else
+          # check for unexpected option
+          if [ "$#" -ge 3 ]; then
+            io_option_unknown $3 $1 $2
+          fi
+
+          # starting containers
+          io_info "Starting application(s) containers ...\n"
+          io_flush
+
+          docker-compose start
+          if [ $? -ne 0 ]; then
+            io_error "Error starting containers\n"
+          fi
+        fi
+        ;;
+      stop)
+        # check for help option
+        if [ "$3" == "help" ]; then
+          io_help_header
+          io_help_title "Listing all options available to the stop action of the xdebug command"
+          io_help_entry_level 3 $command $action "help" " - This menu"
+          io_help_entry_level 2 $command $action " - Stop the application(s) containers"
+        else
+          # check for unexpected option
+          if [ "$#" -ge 3 ]; then
+            io_option_unknown $3 $1 $2
+          fi
+
+          # stopping containers
+          io_info "Stopping application(s) containers ...\n"
+          io_flush
+
+          docker-compose stop
+          if [ $? -ne 0 ]; then
+            io_error "Error stopping containers\n"
+          fi
+        fi
+        ;;
+      down)
+        # check for help option
+        if [ "$3" == "help" ]; then
+          io_help_header
+          io_help_title "Listing all options available to the down action of the xdebug command"
+          io_help_entry_level 3 $command $action "help" " - This menu"
+          io_help_entry_level 2 $command $action " - Teardown the application(s) containers"
+        else
+          # check for unexpected option
+          if [ "$#" -ge 3 ]; then
+            io_option_unknown $3 $1 $2
+          fi
+
+          # stopping containers
+          io_info "Removing the current docker environment containers ...\n"
+          io_flush
+
+          docker-compose down
+          if [ $? -ne 0 ]; then
+            io_error "Error removing containers\n"
+          fi
+        fi
+        ;;
+      *)
+        io_option_unknown $action $command
+        ;;
+    esac
+    ;;
+  *)
+    # check for mandatory application argument
+    if [ -z $1 ]; then
+      io_error_header
+      io_write " Missing application argument (type "
+      io_write_green "$(printf "./%s help" $exec)"
+      io_write " for more information)\n"
+      io_flush
+
+      exit 1
+    fi
+    app=$1
+ 
+    # check if the application exists
+    if ! [ -d $(path $dir_apps/$app) ]; then
+      io_error_header
+      io_write " "
+      io_write_bold $app
+      io_write " application not found (type "
+      io_write_green "$(printf "./%s list" $exec)"
+      io_write " for more information)\n"
+      io_flush
+
+      exit 1
+    fi
+
+    # check for mandatory action argument
+    if [ -z $2 ]; then
+      io_options_missing $app
+    fi
+    action=$2
+
+    # check if the action exists on the application
+    if [ -f $(path $dir_apps/$app/actions/$action.sh) ]; then
+      # call the action over the application
+      . $(path $dir_apps/$app/actions/$action.sh)
+    else
+      # check if the action can be a version
+      if [ -f $(path $dir_apps/$app/$action/state.sh) ]; then
+        # revert action to version
+        version=$action
+
+        # check for mandatory action argument
+        if [ -z $3 ]; then
+          io_option_missing $app $version
+        fi
+        action=$3
+
+        # check if the action exists on the selected version of the application
+        if ! [ -f $(path $dir_apps/$app/$version/actions/$action.sh) ]; then
+          io_option_unknown $action $app $version
+        fi
+
+        # call the action over the selected version of the application
+        . $(path $dir_apps/$app/$version/actions/$action.sh)
+      else
+        io_option_unknown $action $app
+      fi
+    fi
+    ;;
+esac
+
+io_finished

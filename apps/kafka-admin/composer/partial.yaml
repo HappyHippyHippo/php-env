@@ -1,0 +1,9 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: obsidiandynamics/kafdrop
+    environment:
+      KAFKA_BROKERCONNECT: "<domain>-kafka:29092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+    depends_on:
+      - <domain>-kafka

@@ -1,0 +1,3 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: swaggerapi/swagger-validator-v2:latest

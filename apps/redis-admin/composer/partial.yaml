@@ -1,0 +1,7 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:<domain>-redis:6379
+    depends_on:
+      - <domain>-redis

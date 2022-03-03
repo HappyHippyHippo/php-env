@@ -1,0 +1,22 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: webdevops/nginx:alpine
+    user: root
+    volumes:
+      - <dir_apps>/<app>/files/vhost.conf:/opt/docker/etc/nginx/vhost.conf
+      - <dir_data>/<app>/vhosts/all/:/opt/docker/etc/nginx/vhost.d/
+      - <dir_data>/<app>/vhosts/api/:/opt/docker/etc/nginx/vhost.api.d/
+      - <dir_data>/<app>/vhosts/mysql/:/opt/docker/etc/nginx/vhost.mysql.d/
+      - <dir_data>/<app>/vhosts/mongo/:/opt/docker/etc/nginx/vhost.mongo.d/
+      - <dir_data>/<app>/vhosts/kafka/:/opt/docker/etc/nginx/vhost.kafka.d/
+      - <dir_data>/<app>/vhosts/redis/:/opt/docker/etc/nginx/vhost.redis.d/
+      - <dir_data>/<app>/vhosts/elk/:/opt/docker/etc/nginx/vhost.elk.d/
+      - <dir_data>/<app>/vhosts/moodle/:/opt/docker/etc/nginx/vhost.moodle.d/
+      - <dir_data>/<app>/vhosts/openapi/:/opt/docker/etc/nginx/vhost.openapi.d/
+      - <dir_data>/<app>/vhosts/openapi.ui/:/opt/docker/etc/nginx/vhost.openapi.ui.d/
+      - <dir_data>/<app>/vhosts/openapi.editor/:/opt/docker/etc/nginx/vhost.openapi.editor.d/
+      - <dir_data>/<app>/vhosts/openapi.validator/:/opt/docker/etc/nginx/vhost.openapi.validator.d/
+      - <dir_data>/logs/<app>/nginx:/var/lib/nginx/logs
+    ports:
+      - <port>:80
+      - <sport>:443

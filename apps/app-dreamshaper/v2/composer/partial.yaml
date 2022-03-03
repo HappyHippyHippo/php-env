@@ -1,0 +1,16 @@
+  <domain>-<app>-<version>:
+    container_name: <domain>-<app>-<version>
+    image: node:lts-alpine
+    user: "<user>:<group>"
+    working_dir: /app
+    command: /bin/sh -c "cd vue-spa && npm run dev"
+    volumes:
+      - ~/.ssh:/home/application/.ssh
+      - ~/.ssh:/root/.ssh
+      - <dir_code>/<app>-<version>:/app
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: 0.0.0.0
+    depends_on:
+      - <domain>-<app>-v1

@@ -1,0 +1,9 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: node:lts-alpine
+    user: root
+    working_dir: /app
+    command: "npm run serve"
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - <dir_code>/<app>:/app

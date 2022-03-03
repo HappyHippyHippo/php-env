@@ -1,0 +1,10 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: <domain>-mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_ABSOLUTE_URI: mysql.<domain>.local
+    depends_on:
+      - <domain>-mysql

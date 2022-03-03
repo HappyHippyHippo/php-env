@@ -1,0 +1,7 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: docker.elastic.co/beats/filebeat:7.10.2
+    volumes:
+      - <dir_data>/logs:/var/log/beats
+    depends_on:
+      - <domain>-elk

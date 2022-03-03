@@ -1,0 +1,14 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: mariadb:10.4.13
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dreamshaper
+    ports:
+      - 3306:3306
+    command:
+      'mysqld --default-authentication-plugin=mysql_native_password --innodb-flush-method=fsync --innodb-use-native-aio=0'
+    volumes:
+      - <dir_apps>/<app>/files/custom.cnf:/etc/mysql/conf.d/custom.cnf
+      - <dir_apps>/<app>/files/dreamshaper.sql:/docker-entrypoint-initdb.d/dreamshaper.sql
+      - <dir_data>/<app>/db:/var/lib/mysql

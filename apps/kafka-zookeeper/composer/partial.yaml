@@ -1,0 +1,5 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: bitnami/zookeeper:latest
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"

@@ -1,0 +1,185 @@
+# Nginx configuration
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "api.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/api.error.log;
+    access_log /var/log/nginx/api.access.log;
+    
+    return 307 https://$host$request_uri;
+}
+
+server {
+    listen 443;
+    listen [::]:443;
+    server_name "api.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+    include /opt/docker/etc/nginx/vhost.ssl.conf;
+
+    error_log  /var/log/nginx/api.ssl.error.log;
+    access_log /var/log/nginx/api.ssl.access.log;
+
+    include /opt/docker/etc/nginx/vhost.api.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "mysql.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/mysql.error.log;
+    access_log /var/log/nginx/mysql.access.log;
+
+    include /opt/docker/etc/nginx/vhost.mysql.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "mongo.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/mongo.error.log;
+    access_log /var/log/nginx/mongo.access.log;
+
+    include /opt/docker/etc/nginx/vhost.mongo.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "kafka.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/kafka.error.log;
+    access_log /var/log/nginx/kafka.access.log;
+
+    include /opt/docker/etc/nginx/vhost.kafka.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "openapi.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/openapi.error.log;
+    access_log /var/log/nginx/openapi.access.log;
+
+    include /opt/docker/etc/nginx/vhost.openapi.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "openapi.ui.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/openapi.ui.error.log;
+    access_log /var/log/nginx/openapi.ui.access.log;
+
+    include /opt/docker/etc/nginx/vhost.openapi.ui.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "openapi.validator.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/openapi.validator.error.log;
+    access_log /var/log/nginx/openapi.validator.access.log;
+
+    include /opt/docker/etc/nginx/vhost.openapi.validator.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "openapi.editor.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/openapi.editor.error.log;
+    access_log /var/log/nginx/openapi.editor.access.log;
+
+    include /opt/docker/etc/nginx/vhost.openapi.editor.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "redis.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/redis.error.log;
+    access_log /var/log/nginx/redis.access.log;
+
+    include /opt/docker/etc/nginx/vhost.redis.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "elk.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/elk.error.log;
+    access_log /var/log/nginx/elk.access.log;
+
+    include /opt/docker/etc/nginx/vhost.elk.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "moodle.<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/moodle.error.log;
+    access_log /var/log/nginx/moodle.access.log;
+
+    include /opt/docker/etc/nginx/vhost.moodle.d/*.conf;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name "~^(.*)<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+
+    error_log  /var/log/nginx/app.error.log;
+    access_log /var/log/nginx/app.access.log;
+    
+    return 307 https://$host$request_uri;
+}
+
+server {
+    listen 443;
+    listen [::]:443;
+    server_name "~^(.*)<domain>.local";
+
+    include /opt/docker/etc/nginx/vhost.common.d/10-log.conf;
+    include /opt/docker/etc/nginx/vhost.ssl.conf;
+
+    error_log  /var/log/nginx/app.ssl.error.log;
+    access_log /var/log/nginx/app.ssl.access.log;
+
+    include /opt/docker/etc/nginx/vhost.d/*.conf;
+}

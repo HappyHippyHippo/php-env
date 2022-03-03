@@ -1,0 +1,17 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: bitnami/moodle
+    environment:
+      MOODLE_USERNAME: user
+      MOODLE_PASSWORD: password
+      MOODLE_EMAIL: moodle@dreamshaper.com
+      MOODLE_SITE_NAME: Dreamshaper
+      MOODLE_DATABASE_TYPE: mariadb
+      MOODLE_DATABASE_HOST: <domain>-mysql
+      MOODLE_DATABASE_NAME: moodle
+      MOODLE_DATABASE_USER: root
+      MOODLE_DATABASE_PASSWORD: root
+    links:
+      - "<domain>-lti-api-v1:api.<domain>.local"
+    volumes:
+      - <dir_data>/<app>/data:/bitnami/moodle

@@ -1,0 +1,6 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: mongo
+    volumes:
+      - <dir_apps>/<app>/files/mongodb:/data/dump
+      - <dir_data>/<app>/db:/data/db

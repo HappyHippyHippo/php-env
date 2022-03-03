@@ -1,0 +1,5 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: sebp/elk
+    volumes:
+      - <dir_data>/<app>/data:/var/lib/elasticsearch

@@ -1,0 +1,5 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: redis:alpine
+    volumes:
+      - <dir_data>/<app>/db:/data

@@ -1,0 +1,7 @@
+  <domain>-<app>:
+    container_name: <domain>-<app>
+    image: swaggerapi/swagger-ui:latest
+    environment:
+      VALIDATOR_URL: http://openapi.validator.dreamshaper.local/validator
+    depends_on:
+      - <domain>-openapi-validator
