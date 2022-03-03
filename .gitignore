@@ -1,0 +1,11 @@
+/apps/mongo/files/
+/apps/mysql/files/dreamshaper.sql
+/code
+/docker-compose.yaml
+/sandbox
+/data/elk
+/data/logs
+/data/mongo
+/data/moodle
+/data/mysql
+/data/redis

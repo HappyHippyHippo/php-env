@@ -2,7 +2,7 @@
 
 # execution definitions
 exec=run
-domain=ds
+domain=env
 dns="$domain.local"
 
 # directories definitions
